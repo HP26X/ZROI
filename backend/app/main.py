@@ -22,8 +22,61 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory storage for saved campaign snapshots
+# Pre-populated demo scenarios
+DEMO_CAMPAIGNS = [
+    ROIInputs(
+        campaign_name="Summer Esports Championship",
+        channel_type=ChannelType.TWITCH,
+        initial_ad_spend=35000.0,
+        peak_viewership=120000,
+        avg_viewership=65000,
+        broadcast_duration_hours=5.0,
+        estimated_cpm=15.0,
+        conversion_rate_pct=3.2,
+        avg_order_value=75.0,
+        repeat_customer_ltv_multiplier=1.4,
+        organically_amplified_reach_pct=35.0
+    ),
+    ROIInputs(
+        campaign_name="National Championship TV Spot",
+        channel_type=ChannelType.LIVE_TV,
+        initial_ad_spend=150000.0,
+        peak_viewership=850000,
+        avg_viewership=600000,
+        broadcast_duration_hours=3.5,
+        estimated_cpm=28.0,
+        conversion_rate_pct=1.2,
+        avg_order_value=120.0,
+        repeat_customer_ltv_multiplier=1.25,
+        organically_amplified_reach_pct=15.0
+    ),
+    ROIInputs(
+        campaign_name="Viral TikTok Live Product Drop",
+        channel_type=ChannelType.TIKTOK_LIVE,
+        initial_ad_spend=15000.0,
+        peak_viewership=95000,
+        avg_viewership=40000,
+        broadcast_duration_hours=2.0,
+        estimated_cpm=10.0,
+        conversion_rate_pct=4.5,
+        avg_order_value=45.0,
+        repeat_customer_ltv_multiplier=1.5,
+        organically_amplified_reach_pct=60.0
+    )
+]
+
+# Initialize in-memory storage with demo snapshots
 snapshots_db: Dict[str, CampaignSnapshot] = {}
+
+for idx, demo_input in enumerate(DEMO_CAMPAIGNS):
+    snap_id = f"demo-{idx + 1}"
+    snapshots_db[snap_id] = CampaignSnapshot(
+        id=snap_id,
+        title=demo_input.campaign_name,
+        created_at="Pre-loaded Demo Scenario",
+        inputs=demo_input,
+        result=calculate_roi(demo_input)
+    )
 
 @app.get("/")
 def read_root():
@@ -46,7 +99,7 @@ def calculate_roi_endpoint(inputs: ROIInputs):
 
 @app.get("/api/snapshots", response_model=List[CampaignSnapshot])
 def list_snapshots():
-    """List all saved campaign snapshots."""
+    """List all saved campaign snapshots including demo scenarios."""
     return list(snapshots_db.values())
 
 @app.post("/api/snapshots", response_model=CampaignSnapshot)

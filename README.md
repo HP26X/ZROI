@@ -1,14 +1,34 @@
 # ZROI - Live Event ROI Forecasting & Analytics System
 
-ZROI is an interactive web platform and algorithmic engine designed to forecast and calculate Return on Investment (ROI) for brands marketing across **TV broadcasts** and **Online Streaming Events** (Twitch, YouTube Live, Streaming TV, OTT).
+ZROI is an interactive web platform and algorithmic engine designed to forecast and calculate Return on Investment (ROI) for brands marketing across **TV broadcasts** and **Online Streaming Events** (Twitch, YouTube Live, TikTok Live, OTT).
 
-## Key Features
+## Live Demo Walkthrough
 
-- **Live Adjustable ROI Forecasting Engine**: Instant recalculations driven by dynamic interactive sliders for Ad Spend, Viewership, Conversion Rate, CPM, and Broadcast Duration.
-- **Multi-Channel Trend Benchmark Algorithms**: Specialized algorithms adjusting for channel characteristics (e.g., Live TV high-reach linear decay vs. Twitch high-engagement chat interactive spikes).
-- **Interactive Graphs & Visualizations**: Timeline projections showing expected ROI %, revenue trajectories, total impression reach, and cost comparisons over time.
-- **Snapshot & Scenario Comparison**: Save timeline snapshots of different marketing campaigns, compare expected vs. aggressive forecast models, and export data.
-- **Full-Stack Architecture**: Built with Python (FastAPI) on the backend for high-precision mathematical models and React (TypeScript + Tailwind CSS + Recharts) on the frontend.
+### 1. Interactive Forecasting Sliders
+Adjust parameters live to see immediate recalculations across KPI cards and 12-month projections:
+- **Initial Ad Spend ($)**: Range $1k - $250k
+- **Viewership Metrics**: Concurrent average viewership and peak concurrent spikes
+- **Broadcast Duration**: Event length in hours
+- **Conversion Rate (%)**: Direct digital action percentage
+- **Avg Order Value ($) & LTV Multiplier**: Customer value and repeat purchase factor
+- **Organic Amplification (%)**: Viral reach coefficient per channel
+
+### 2. Multi-Channel Benchmarks
+Select different broadcast formats to apply channel-specific decay and viral benchmarks:
+- **Twitch Live Streaming**: High chat engagement, direct digital conversion, fast peak
+- **YouTube Live & VOD**: Long-tail replay value and sustained search traffic
+- **Live Broadcast TV**: Mass national reach with linear decay
+- **TikTok Live**: High viral impulse purchases and short session loops
+- **OTT / Connected TV**: Targeted digital CTV ads with cross-device attribution
+
+### 3. Interactive Visualizations
+Switch between 3 graph views:
+- **ROI % Curve**: Cumulative 12-month Return on Investment
+- **Revenue vs Cost**: Direct sales revenue vs. total LTV revenue vs. initial ad spend
+- **Conversions**: Projected monthly conversion volumes
+
+### 4. Scenario Snapshots & Export
+Click **"Load Full Demo"** to populate pre-configured commercial scenarios (Super Bowl TV spot, Twitch Esports Championship, TikTok Live viral drop). Save custom models, compare scenarios side-by-side, and export complete model data as JSON.
 
 ## Project Structure
 
@@ -19,7 +39,7 @@ ZROI is an interactive web platform and algorithmic engine designed to forecast 
 │   ├── tests/          # Unit and integration tests
 │   └── requirements.txt
 ├── frontend/           # React + TypeScript + Vite frontend
-│   ├── src/            # Components, hooks, ROI state, and charts
+│   ├── src/            # Components, demo scenarios, ROI engine, and charts
 │   └── package.json
 ├── LICENSE             # Proprietary License
 └── README.md           # Documentation
