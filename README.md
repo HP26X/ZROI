@@ -21,7 +21,7 @@ ZROI is an interactive web platform and algorithmic engine designed to forecast 
 ├── frontend/           # React + TypeScript + Vite frontend
 │   ├── src/            # Components, hooks, ROI state, and charts
 │   └── package.json
-├── LICENSE             # MIT License
+├── LICENSE             # Proprietary License
 └── README.md           # Documentation
 ```
 
@@ -46,4 +46,4 @@ npm run dev
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under a Proprietary / All Rights Reserved License - see the [LICENSE](LICENSE) file for details.
