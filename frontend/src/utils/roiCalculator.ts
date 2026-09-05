@@ -53,6 +53,14 @@ export const CHANNEL_BENCHMARKS: Record<ChannelType, ChannelBenchmark> = {
   }
 };
 
+const CHANNEL_LINKS: Record<ChannelType, { label: string; url: string }> = {
+  twitch: { label: 'Open Twitch Ad Console', url: 'https://www.twitch.tv/advertise' },
+  youtube_live: { label: 'Start a YouTube Video Campaign', url: 'https://ads.google.com/home/' },
+  tiktok_live: { label: 'TikTok Business Ads', url: 'https://www.tiktok.com/business/en' },
+  live_tv: { label: 'Television advertising overview', url: 'https://en.wikipedia.org/wiki/Television_advertisement' },
+  ott_streaming: { label: 'Connected TV advertising overview', url: 'https://en.wikipedia.org/wiki/Connected_TV' },
+};
+
 export function computeLocalROI(inputs: ROIInputs): ROICalculationResult {
   const benchmark = CHANNEL_BENCHMARKS[inputs.channel_type] || CHANNEL_BENCHMARKS.twitch;
 
@@ -127,7 +135,12 @@ export function computeLocalROI(inputs: ROIInputs): ROICalculationResult {
     channel_insights: {
       channel_name: benchmark.name,
       benchmark_summary: benchmark.description,
-      recommendation: `For ${benchmark.name}, target a CPM below ${benchmark.cpm_range} and optimize post-stream retargeting for optimal LTV conversion.`
+      recommendation: `For ${benchmark.name}, target a CPM below ${benchmark.cpm_range} and optimize post-stream retargeting for optimal LTV conversion.`,
+      action_label: CHANNEL_LINKS[inputs.channel_type]?.label,
+      action_url: CHANNEL_LINKS[inputs.channel_type]?.url,
+      pro_insight: roi_percentage >= 0
+        ? 'Positive ROI projected — upgrade to Pro to export this forecast as a client-ready report and compare multiple scenarios side by side.'
+        : 'ROI is currently negative. Adjust ad spend, conversion rate, or order value above to find your breakeven — Pro saves unlimited scenarios and exports client reports.'
     }
   };
 }

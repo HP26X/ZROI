@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend
 } from 'recharts';
-import { TrendingUp, DollarSign, Eye, ShoppingCart, Award, Sparkles, AlertCircle } from 'lucide-react';
+import { TrendingUp, DollarSign, Eye, ShoppingCart, Award, Sparkles, AlertCircle, ExternalLink } from 'lucide-react';
 
 interface Props {
   result: ROICalculationResult;
@@ -219,6 +219,30 @@ export const ChartsDashboard: React.FC<Props> = ({ result }) => {
           Viral Factor: {CHANNEL_BENCHMARKS[result.inputs.channel_type].viral_coefficient}x
         </div>
       </div>
+
+      {/* Channel action link + Pro tier callout */}
+      {result.channel_insights.action_url && (
+        <div className="flex justify-center sm:justify-start">
+          <a
+            href={result.channel_insights.action_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 px-4 py-2 rounded-xl transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" />
+            {result.channel_insights.action_label}
+          </a>
+        </div>
+      )}
+      {result.channel_insights.pro_insight && (
+        <div className="flex justify-center sm:justify-start">
+          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl">
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span className="text-amber-400 font-bold mr-1">PRO</span>
+            <span className="text-slate-300">{result.channel_insights.pro_insight}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

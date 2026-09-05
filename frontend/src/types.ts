@@ -41,6 +41,9 @@ export interface ROICalculationResult {
     channel_name: string;
     benchmark_summary: string;
     recommendation: string;
+    action_label?: string;
+    action_url?: string;
+    pro_insight?: string;
   };
 }
 

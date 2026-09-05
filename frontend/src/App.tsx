@@ -7,6 +7,9 @@ import { ChartsDashboard } from './components/ChartsDashboard';
 import { SnapshotsPanel } from './components/SnapshotsPanel';
 import { Activity, Sparkles, Layers } from 'lucide-react';
 
+// TODO: replace with your real Stripe/Lemon Squeezy payment link
+const PRO_CHECKOUT_URL = 'https://example.com/zroi-pro-checkout-replace-me';
+
 const DEFAULT_INPUTS: ROIInputs = {
   campaign_name: 'Summer Esports Championship',
   channel_type: 'twitch',
@@ -25,6 +28,7 @@ export const App: React.FC = () => {
   const [inputs, setInputs] = useState<ROIInputs>(DEFAULT_INPUTS);
   const [snapshots, setSnapshots] = useState<CampaignSnapshot[]>(getDemoSnapshots());
   const [apiOnline, setApiOnline] = useState<boolean>(false);
+  const [showProModal, setShowProModal] = useState<boolean>(false);
 
   // Compute ROI instantly using local engine (and sync with backend if online)
   const result = useMemo(() => computeLocalROI(inputs), [inputs]);
@@ -49,6 +53,27 @@ export const App: React.FC = () => {
       });
   }, []);
 
+  // Load persisted snapshots from localStorage on mount.
+  // On GitHub Pages (no backend) this is what survives a refresh.
+  // When the backend is online its snapshot list overrides this later.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('zroi_snapshots');
+      if (stored) {
+        const parsed = JSON.parse(stored) as CampaignSnapshot[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setSnapshots((prev) => {
+            const existingIds = new Set(prev.map((s) => s.id));
+            const newOnes = parsed.filter((s) => !existingIds.has(s.id));
+            return [...newOnes, ...prev];
+          });
+        }
+      }
+    } catch {
+      // ignore corrupt storage
+    }
+  }, []);
+
   const handleReset = () => {
     setInputs(DEFAULT_INPUTS);
   };
@@ -67,7 +92,11 @@ export const App: React.FC = () => {
       result,
     };
 
-    setSnapshots((prev) => [newSnapshot, ...prev]);
+    setSnapshots((prev) => {
+      const next = [newSnapshot, ...prev];
+      try { localStorage.setItem('zroi_snapshots', JSON.stringify(next)); } catch {}
+      return next;
+    });
 
     // Attempt backend sync
     if (apiOnline) {
@@ -88,7 +117,11 @@ export const App: React.FC = () => {
   };
 
   const handleDeleteSnapshot = async (id: string) => {
-    setSnapshots((prev) => prev.filter((s) => s.id !== id));
+    setSnapshots((prev) => {
+      const next = prev.filter((s) => s.id !== id);
+      try { localStorage.setItem('zroi_snapshots', JSON.stringify(next)); } catch {}
+      return next;
+    });
     if (apiOnline) {
       try {
         await fetch(`http://localhost:8000/api/snapshots/${id}`, {
@@ -112,9 +145,13 @@ export const App: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xl font-extrabold tracking-tight text-white">ZROI</span>
-                <span className="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                <button
+                  type="button"
+                  onClick={() => setShowProModal(true)}
+                  className="text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full hover:bg-amber-500/20 transition-colors shrink-0"
+                >
                   PRO
-                </span>
+                </button>
               </div>
               <p className="text-[11px] text-slate-400">Live Event & Broadcast ROI Forecasting System</p>
             </div>
@@ -180,6 +217,65 @@ export const App: React.FC = () => {
           ZROI Brand Marketing Analytics System • Commercial Forecast Platform
         </div>
       </footer>
+
+      {/* Pro tier upgrade modal */}
+      {showProModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+          onClick={() => setShowProModal(false)}
+        >
+          <div
+            className="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="bg-gradient-to-tr from-emerald-500 to-teal-400 p-1.5 rounded-lg text-slate-950">
+                  <Activity className="w-4 h-4" />
+                </div>
+                <h3 className="text-lg font-extrabold text-white">ZROI Pro</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowProModal(false)}
+                className="text-slate-400 hover:text-white text-xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <p className="text-sm text-slate-300 mb-5">
+              Unlock client-ready reporting and multi-campaign tools for your forecasting workflow.
+            </p>
+
+            <div className="space-y-3 mb-6 text-sm">
+              {[
+                { feature: 'Unlimited scenario snapshots', free: '1 at a time' },
+                { feature: 'PDF client report export', free: 'JSON only' },
+                { feature: 'Multi-campaign comparison view', free: 'Single view' },
+                { feature: 'Custom channel benchmark editing', free: 'Locked to defaults' },
+                { feature: 'Browser snapshot persistence', free: 'Session only' },
+              ].map((row) => (
+                <div key={row.feature} className="flex items-center justify-between text-xs">
+                  <span className="text-slate-300">{row.feature}</span>
+                  <span className="text-slate-500">{row.free}</span>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href={PRO_CHECKOUT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-extrabold py-3 rounded-xl text-center transition-colors shadow-lg shadow-emerald-600/20"
+            >
+              Upgrade to Pro — $9/month
+            </a>
+            <p className="text-[10px] text-slate-500 text-center mt-3">
+              Annual billing and team plans available on request.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
