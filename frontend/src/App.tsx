@@ -7,6 +7,11 @@ import { ChartsDashboard } from './components/ChartsDashboard';
 import { SnapshotsPanel } from './components/SnapshotsPanel';
 import { Activity, Sparkles, Layers } from 'lucide-react';
 
+// Backend URL — only attempts the API when VITE_BACKEND_URL is set
+// (i.e. when self-hosting with a real FastAPI server). On GitHub Pages builds
+// this env var is absent, so the fetch is skipped entirely (no CORS noise).
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 // TODO: replace with your real Stripe/Lemon Squeezy payment link
 const PRO_CHECKOUT_URL = 'https://example.com/zroi-pro-checkout-replace-me';
 
@@ -34,10 +39,12 @@ export const App: React.FC = () => {
   const result = useMemo(() => computeLocalROI(inputs), [inputs]);
 
   // Check backend availability & fetch server snapshots.
-  // Swallow CORS/network errors silently — the backend only exists when self-hosted;
-  // on GitHub Pages we intentionally run in "Local Algorithmic Mode" with no backend.
+  // Only runs when VITE_BACKEND_URL is set (self-hosted deployments).
+  // On GitHub Pages this env var is absent, so we skip the fetch entirely —
+  // no CORS noise, and the app stays in "Local Algorithmic Mode".
   useEffect(() => {
-    fetch('http://localhost:8000/api/snapshots')
+    if (!BACKEND_URL) return; // nothing to call — stay offline
+    fetch(`${BACKEND_URL}/api/snapshots`)
       .then((res) => {
         if (res.ok) {
           setApiOnline(true);
@@ -51,7 +58,7 @@ export const App: React.FC = () => {
         }
       })
       .catch(() => {
-        // Expected on GitHub Pages: no backend available → silent fallback.
+        // Backend unreachable — stay in local mode, no console noise.
       });
   }, []);
 
@@ -101,15 +108,15 @@ export const App: React.FC = () => {
     });
 
     // Attempt backend sync
-    if (apiOnline) {
+    if (BACKEND_URL) {
       try {
-        await fetch('http://localhost:8000/api/snapshots', {
+        await fetch(`${BACKEND_URL}/api/snapshots`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(inputs),
         });
       } catch (e) {
-        console.error('Snapshot API error:', e);
+        // backend offline — snapshot still saved locally
       }
     }
   };
@@ -124,13 +131,13 @@ export const App: React.FC = () => {
       try { localStorage.setItem('zroi_snapshots', JSON.stringify(next)); } catch {}
       return next;
     });
-    if (apiOnline) {
+    if (BACKEND_URL) {
       try {
-        await fetch(`http://localhost:8000/api/snapshots/${id}`, {
+        await fetch(`${BACKEND_URL}/api/snapshots/${id}`, {
           method: 'DELETE',
         });
       } catch (e) {
-        console.error('Delete API error:', e);
+        // backend offline — snapshot still deleted locally
       }
     }
   };
