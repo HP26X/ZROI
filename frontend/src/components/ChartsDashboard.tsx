@@ -35,61 +35,74 @@ export const ChartsDashboard: React.FC<Props> = ({ result }) => {
     <div className="space-y-6">
       {/* KPI Cards Header */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Forecasted ROI */}
+        {/* ROI & ROAS */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Forecasted ROI</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">ROI / ROAS</span>
             <div className={`p-2 rounded-xl ${isPositiveROI ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 space-y-1">
             <div className={`text-xl xl:text-2xl font-extrabold truncate ${isPositiveROI ? 'text-emerald-400' : 'text-rose-400'}`}>
               {result.roi_percentage > 0 ? '+' : ''}{result.roi_percentage}%
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 truncate">
-              Net Profit: <span className="font-semibold text-slate-200">{formatCurrency(result.net_profit)}</span>
-            </p>
+            <div className="flex justify-between text-[11px]">
+              <span className="text-slate-400">Net Profit: <span className="font-semibold text-slate-200">{formatCurrency(result.net_profit)}</span></span>
+              <span className="text-slate-400">ROAS: <span className="font-semibold text-slate-200">{result.roas.toFixed(2)}x</span></span>
+            </div>
+            <div className="text-[10px] text-slate-500">
+              Payback: {result.payback_month <= 12 ? `Month ${result.payback_month}` : '>12 mo'}
+            </div>
           </div>
         </div>
 
-        {/* Total Projected Revenue */}
+        {/* Total Revenue */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">LTV Revenue</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">12-Mo Revenue</span>
             <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400">
-              <DollarSign className="w-4 h-4" />
+              <Award className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 space-y-1">
             <div className="text-xl xl:text-2xl font-extrabold text-blue-400 truncate">
-              {formatCurrency(result.ltv_revenue)}
+              {formatCurrency(result.total_revenue)}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 truncate">
-              Direct Sales: <span className="font-semibold text-slate-200">{formatCurrency(result.direct_revenue)}</span>
-            </p>
+            <div className="flex justify-between text-[11px]">
+              <span className="text-slate-400">Direct: <span className="font-semibold text-slate-200">{formatCurrency(result.direct_revenue)}</span></span>
+              <span className="text-slate-400">LTV: <span className="font-semibold text-slate-200">{formatCurrency(result.ltv_revenue)}</span></span>
+            </div>
+            {result.brand_lift_total > 0 && (
+              <div className="text-[10px] text-amber-400/70">
+                Brand lift: {formatCurrency(result.brand_lift_total)}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Impression Reach & eCPM */}
+        {/* Reach & CPM */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Impression Reach</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Reach & CPM</span>
             <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
               <Eye className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 space-y-1">
             <div className="text-xl xl:text-2xl font-extrabold text-purple-400 truncate">
-              {result.total_impressions.toLocaleString()}
+              {result.unique_reach.toLocaleString()}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 truncate">
-              Effective CPM: <span className="font-semibold text-slate-200">${result.effective_cpm}</span>
-            </p>
+            <div className="text-[11px] text-slate-400">
+              Unique viewers (est.)
+            </div>
+            <div className="text-[10px] text-slate-500">
+              eCPM: <span className="font-semibold text-slate-300">${result.effective_cpm}</span> · Impressions: {result.total_impressions.toLocaleString()}
+            </div>
           </div>
         </div>
 
-        {/* Projected Conversions */}
+        {/* Conversions & CPA */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Conversions</span>
@@ -97,13 +110,17 @@ export const ChartsDashboard: React.FC<Props> = ({ result }) => {
               <ShoppingCart className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-2 space-y-1">
             <div className="text-xl xl:text-2xl font-extrabold text-amber-400 truncate">
               {result.estimated_conversions.toLocaleString()}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 truncate">
-              Breakeven: <span className="font-semibold text-slate-200">{result.breakeven_conversions.toLocaleString()} units</span>
-            </p>
+            <div className="flex justify-between text-[11px]">
+              <span className="text-slate-400">CPA: <span className="font-semibold text-slate-200">${result.cpa}</span></span>
+              <span className="text-slate-400">BE: <span className="font-semibold text-slate-200">{result.breakeven_conversions.toLocaleString()}</span></span>
+            </div>
+            <div className="text-[10px] text-slate-500">
+              {result.estimated_conversions > 0 ? `Acquire ${result.breakeven_conversions.toLocaleString()} to break even` : 'No conversions at current rate'}
+            </div>
           </div>
         </div>
       </div>

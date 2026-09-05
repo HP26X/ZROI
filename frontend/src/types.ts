@@ -22,6 +22,7 @@ export interface TimelinePoint {
   total_revenue: number;
   cumulative_cost: number;
   roi_percentage: number;
+  payback_achieved: boolean;
   projected_conversions: number;
   impressions: number;
 }
@@ -29,13 +30,19 @@ export interface TimelinePoint {
 export interface ROICalculationResult {
   inputs: ROIInputs;
   total_impressions: number;
+  unique_reach: number;
   effective_cpm: number;
   estimated_conversions: number;
   direct_revenue: number;
   ltv_revenue: number;
+  brand_lift_total: number;
+  total_revenue: number;
   net_profit: number;
   roi_percentage: number;
+  roas: number;
+  cpa: number;
   breakeven_conversions: number;
+  payback_month: number;
   timeline_forecast: TimelinePoint[];
   channel_insights: {
     channel_name: string;

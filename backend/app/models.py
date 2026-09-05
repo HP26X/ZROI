@@ -21,7 +21,7 @@ class ROIInputs(BaseModel):
     estimated_cpm: float = Field(15.0, ge=0, description="Cost per thousand impressions ($)")
     conversion_rate_pct: float = Field(2.5, ge=0, le=100, description="Conversion rate percentage (%)")
     avg_order_value: float = Field(50.0, ge=0, description="Average order value per conversion ($)")
-    repeat_customer_ltv_multiplier: float = Field(1.2, ge=1.0, description="LTV growth multiplier")
+    repeat_customer_ltv_multiplier: float = Field(1.2, ge=1.0, description="LTV growth multiplier (1.4 = 40% repeat value)")
     organically_amplified_reach_pct: float = Field(20.0, ge=0, description="Viral / organic amplification percentage (%)")
 
 class ChannelBenchmark(BaseModel):
@@ -42,19 +42,26 @@ class TimelinePoint(BaseModel):
     total_revenue: float
     cumulative_cost: float
     roi_percentage: float
+    payback_achieved: bool = False
     projected_conversions: int
     impressions: int
 
 class ROICalculationResult(BaseModel):
     inputs: ROIInputs
     total_impressions: int
+    unique_reach: int
     effective_cpm: float
     estimated_conversions: int
     direct_revenue: float
     ltv_revenue: float
+    brand_lift_total: float = 0.0
+    total_revenue: float
     net_profit: float
     roi_percentage: float
+    roas: float
+    cpa: float
     breakeven_conversions: int
+    payback_month: int
     timeline_forecast: List[TimelinePoint]
     channel_insights: Dict[str, str]
 
