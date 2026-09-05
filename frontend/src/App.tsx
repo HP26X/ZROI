@@ -33,7 +33,9 @@ export const App: React.FC = () => {
   // Compute ROI instantly using local engine (and sync with backend if online)
   const result = useMemo(() => computeLocalROI(inputs), [inputs]);
 
-  // Check backend availability & fetch server snapshots
+  // Check backend availability & fetch server snapshots.
+  // Swallow CORS/network errors silently — the backend only exists when self-hosted;
+  // on GitHub Pages we intentionally run in "Local Algorithmic Mode" with no backend.
   useEffect(() => {
     fetch('http://localhost:8000/api/snapshots')
       .then((res) => {
@@ -49,7 +51,7 @@ export const App: React.FC = () => {
         }
       })
       .catch(() => {
-        setApiOnline(false);
+        // Expected on GitHub Pages: no backend available → silent fallback.
       });
   }, []);
 
